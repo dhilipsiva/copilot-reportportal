@@ -1,0 +1,15 @@
+name: rabbitmq
+type: Backend Service
+
+image:
+  location: rabbitmq:3.7.16-management
+  port: 5672
+
+cpu: 256
+memory: 512
+count: 1
+exec: true
+
+variables:
+  RABBITMQ_DEFAULT_USER: rabbitmq
+  RABBITMQ_DEFAULT_PASS: rabbitmq

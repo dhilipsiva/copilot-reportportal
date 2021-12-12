@@ -1,0 +1,15 @@
+name: index
+type: Backend Service
+
+image:
+  location: reportportal/service-index:5.0.11
+  port: 8080
+
+cpu: 256
+memory: 512
+count: 1
+exec: true
+
+variables:
+  LB_URL: http://traefik.test.reportportal.local:8080
+  TRAEFIK_V2_MODE: true

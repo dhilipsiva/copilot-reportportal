@@ -1,0 +1,24 @@
+name: metrics-gatherer
+type: Backend Service
+
+image:
+  location: reportportal/service-metrics-gatherer:1.1.15
+
+cpu: 256
+memory: 512
+count: 1
+exec: true
+
+variables:
+  LOGGING_LEVEL: info
+  ES_HOST: https://ELASTICSEARCH_HOST
+  ES_USER: ES_USER
+  ES_PASSWORD: ES_PASS
+  POSTGRES_USER: DB_USER
+  POSTGRES_PASSWORD: DB_PASS
+  POSTGRES_DB: DB_NAME
+  POSTGRES_HOST: DB_HOST
+  POSTGRES_PORT: 5432
+  ALLOWED_START_TIME: 22:00
+  ALLOWED_END_TIME: 08:00
+  AMQP_URL: amqp://rabbitmq:rabbitmq@rabbitmq.test.reportportal.local:5672

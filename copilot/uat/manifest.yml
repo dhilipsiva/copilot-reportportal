@@ -1,0 +1,22 @@
+name: uat
+type: Backend Service
+
+image:
+  location: reportportal/service-authorization:5.5.0
+  port: 9999
+
+cpu: 1024
+memory: 2048
+count: 1
+exec: true
+
+variables:
+  RP_DB_HOST: DB_HOST
+  RP_DB_USER: DB_USER
+  RP_DB_PASS: DB_PASS
+  RP_DB_NAME: DB_NAME
+  RP_BINARYSTORE_TYPE: minio
+  RP_BINARYSTORE_MINIO_ENDPOINT: http://minio.test.reportportal.local:9000
+  RP_BINARYSTORE_MINIO_ACCESSKEY: miniorootuser
+  RP_BINARYSTORE_MINIO_SECRETKEY: miniorootpass
+  RP_SESSION_LIVE: 86400

@@ -1,0 +1,16 @@
+ping: {}
+
+api:
+  dashboard: false
+  insecure: true
+
+providers:
+  file:
+    directory: /etc/traefik-providers
+
+entryPoints:
+  web:
+    address: ":80"
+
+  traefik:
+    address: ":8080"

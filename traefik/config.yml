@@ -1,0 +1,95 @@
+http:
+  services:
+    uat:
+      loadBalancer:
+        servers:
+          - url: http://uat.test.reportportal.local:9999
+        passHostHeader: true
+
+    index:
+      loadBalancer:
+        servers:
+          - url: http://index.test.reportportal.local:8080
+        passHostHeader: true
+
+    api:
+      loadBalancer:
+        servers:
+          - url: http://api.test.reportportal.local:8585
+        passHostHeader: true
+
+    jobs:
+      loadBalancer:
+        servers:
+          - url: http://jobs.test.reportportal.local:8686
+        passHostHeader: true
+
+    ui:
+      loadBalancer:
+        servers:
+          - url: http://ui.test.reportportal.local:8080
+        passHostHeader: true
+
+    ping:
+      loadBalancer:
+        servers:
+          - url: http://traefik.test.reportportal.local:8080
+        passHostHeader: true
+
+  middlewares:
+    uat-strip-prefix:
+      stripprefix:
+        prefixes: /uat
+
+    api-strip-prefix:
+      stripprefix:
+        prefixes: /api
+
+    jobs-strip-prefix:
+      stripprefix:
+        prefixes: /jobs
+
+    ui-strip-prefix:
+      stripprefix:
+        prefixes: /ui
+
+  routers:
+    uat:
+      entryPoints:
+      - web
+      service: uat
+      middlewares: uat-strip-prefix
+      rule: PathPrefix(`/uat`)
+
+    index:
+      entryPoints:
+      - web
+      service: index
+      rule: PathPrefix(`/`)
+
+    api:
+      entryPoints:
+      - web
+      service: api
+      middlewares: api-strip-prefix
+      rule: PathPrefix(`/api`)
+
+    jobs:
+      entryPoints:
+      - web
+      service: jobs
+      middlewares: jobs-strip-prefix
+      rule: PathPrefix(`/jobs`)
+
+    ui:
+      entryPoints:
+      - web
+      service: ui
+      middlewares: ui-strip-prefix
+      rule: PathPrefix(`/ui`)
+
+    ping:
+      entryPoints:
+      - web
+      service: ping
+      rule: PathPrefix(`/ping`)

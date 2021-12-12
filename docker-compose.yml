@@ -1,0 +1,130 @@
+version: "3"
+
+volumes:
+  minio_data: {}
+  traefik_acme: {}
+
+services:
+  gateway:
+    env_file: .env
+    build: traefik
+    ports:
+      - 0.0.0.0:80:80
+      - 0.0.0.0:443:443
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - traefik_acme:/etc/traefik/acme/ # Defined in traefik/traefik.toml
+    restart: always
+
+  rabbitmq:
+    env_file: .env
+    image: rabbitmq:3.7.16-management
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      retries: 5
+    restart: always
+
+  analyzer:
+    env_file: .env
+    image: reportportal/service-auto-analyzer:5.5.0
+    restart: always
+
+  analyzer_train:
+    env_file: .env
+    image: reportportal/service-auto-analyzer:5.5.0
+    restart: always
+    environment:
+      INSTANCE_TASK_TYPE: train
+
+  metrics-gatherer:
+    env_file: .env
+    image: reportportal/service-metrics-gatherer:1.1.15
+    restart: always
+
+  db-scripts:
+    env_file: .env
+    image: reportportal/migrations:5.5.0
+    restart: on-failure
+
+  uat:
+    env_file: .env
+    image: reportportal/service-authorization:5.5.0
+    labels:
+      - "traefik.expose=true"
+      - "traefik.http.middlewares.uat-strip-prefix.stripprefix.prefixes=/uat"
+      - "traefik.http.routers.uat.middlewares=uat-strip-prefix@docker"
+      - "traefik.http.routers.uat.rule=PathPrefix(`/uat`)"
+      - "traefik.http.routers.uat.service=uat"
+      - "traefik.http.services.uat.loadbalancer.server.port=9999"
+      - "traefik.http.services.uat.loadbalancer.server.scheme=http"
+    restart: always
+
+  index:
+    env_file: .env
+    image: reportportal/service-index:5.0.11
+    depends_on:
+      gateway:
+        condition: service_started
+    labels:
+      - "traefik.expose=true"
+      - "traefik.http.routers.index.rule=PathPrefix(`/`)"
+      - "traefik.http.routers.index.service=index"
+      - "traefik.http.services.index.loadbalancer.server.port=8080"
+      - "traefik.http.services.index.loadbalancer.server.scheme=http"
+    restart: always
+
+  api:
+    env_file: .env
+    image: reportportal/service-api:5.5.1
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      gateway:
+        condition: service_started
+    labels:
+      - "traefik.expose=true"
+      - "traefik.http.middlewares.api-strip-prefix.stripprefix.prefixes=/api"
+      - "traefik.http.routers.api.middlewares=api-strip-prefix@docker"
+      - "traefik.http.routers.api.rule=PathPrefix(`/api`)"
+      - "traefik.http.routers.api.service=api"
+      - "traefik.http.services.api.loadbalancer.server.port=8585"
+      - "traefik.http.services.api.loadbalancer.server.scheme=http"
+    restart: always
+
+  jobs:
+    env_file: .env
+    image: reportportal/service-jobs:5.5.0
+    labels:
+      - "traefik.expose=true"
+      - "traefik.http.middlewares.jobs-strip-prefix.stripprefix.prefixes=/jobs"
+      - "traefik.http.routers.jobs.middlewares=jobs-strip-prefix@docker"
+      - "traefik.http.routers.jobs.rule=PathPrefix(`/jobs`)"
+      - "traefik.http.routers.jobs.service=jobs"
+      - "traefik.http.services.jobs.loadbalancer.server.port=8686"
+      - "traefik.http.services.jobs.loadbalancer.server.scheme=http"
+
+  ui:
+    env_file: .env
+    image: reportportal/service-ui:5.5.1
+    labels:
+      - "traefik.expose=true"
+      - "traefik.http.middlewares.ui-strip-prefix.stripprefix.prefixes=/ui"
+      - "traefik.http.routers.ui.middlewares=ui-strip-prefix@docker"
+      - "traefik.http.routers.ui.rule=PathPrefix(`/ui`)"
+      - "traefik.http.routers.ui.service=ui"
+      - "traefik.http.services.ui.loadbalancer.server.port=8080"
+      - "traefik.http.services.ui.loadbalancer.server.scheme=http"
+    restart: always
+
+  minio:
+    env_file: .env
+    image: minio/minio:RELEASE.2021-11-24T23-19-33Z
+    volumes:
+      - minio_data:/data
+    command: server /data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    restart: always

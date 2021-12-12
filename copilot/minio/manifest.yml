@@ -1,0 +1,17 @@
+name: minio
+type: Backend Service
+
+image:
+  location: minio/minio:RELEASE.2021-11-24T23-19-33Z
+  port: 9000
+
+cpu: 256
+memory: 512
+count: 1
+exec: true
+
+variables:
+  MINIO_ROOT_USER: miniorootuser
+  MINIO_ROOT_PASSWORD: miniorootpass
+
+command: server /tmp

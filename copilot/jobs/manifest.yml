@@ -1,0 +1,26 @@
+name: jobs
+type: Backend Service
+
+image:
+  location: reportportal/service-jobs:5.5.0
+  port: 8686
+
+cpu: 256
+memory: 512
+count: 1
+exec: true
+
+variables:
+  RP_DB_HOST: DB_HOST
+  RP_DB_USER: DB_USER
+  RP_DB_PASS: DB_PASS
+  RP_DB_NAME: DB_NAME
+  DATASTORE_TYPE: minio
+  DATASTORE_MINIO_ENDPOINT: http://minio.test.reportportal.local:9000
+  DATASTORE_MINIO_ACCESSKEY: miniorootuser
+  DATASTORE_MINIO_SECRETKEY: miniorootpass
+  RP_ENVIRONMENT_VARIABLE_CLEAN_ATTACHMENT_CRON: "0 0 */24 * * *"
+  RP_ENVIRONMENT_VARIABLE_CLEAN_LOG_CRON: "0 0 */24 * * *"
+  RP_ENVIRONMENT_VARIABLE_CLEAN_LAUNCH_CRON: "0 0 */24 * * *"
+  RP_ENVIRONMENT_VARIABLE_CLEAN_STORAGE_CRON: "0 0 */24 * * *"
+  RP_ENVIRONMENT_VARIABLE_STORAGE_PROJECT_CRON: "0 */5 * * * *"

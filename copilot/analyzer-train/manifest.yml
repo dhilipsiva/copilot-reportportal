@@ -1,0 +1,20 @@
+name: analyzer-train
+type: Backend Service
+
+image:
+  location: reportportal/service-auto-analyzer:5.5.0
+
+cpu: 256
+memory: 512
+count: 1
+exec: true
+
+variables:
+  LOGGING_LEVEL: info
+  AMQP_URL: amqp://rabbitmq:rabbitmq@rabbitmq.test.reportportal.local:5672
+  ES_HOSTS: https://ES_USER:ES_PASS@ELASTICSEARCH_HOST
+  MINIO_SHORT_HOST: minio.test.reportportal.local:9000
+  MINIO_ACCESS_KEY: miniorootuser
+  MINIO_SECRET_KEY: miniorootpass
+  INSTANCE_TASK_TYPE: train
+  UWSGI_WORKERS: 1

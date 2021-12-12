@@ -1,0 +1,29 @@
+name: api
+type: Backend Service
+
+image:
+  location: reportportal/service-api:5.5.1
+  port: 8585
+
+cpu: 1024
+memory: 2048
+count: 1
+exec: true
+
+variables:
+  RP_DB_HOST: DB_HOST
+  RP_DB_USER: DB_USER
+  RP_DB_PASS: DB_PASS
+  RP_DB_NAME: DB_NAME
+  RP_AMQP_HOST: rabbitmq.test.reportportal.local
+  RP_AMQP_PORT: 5672
+  RP_AMQP_USER: rabbitmq
+  RP_AMQP_PASS: rabbitmq
+  RP_AMQP_APIUSER: rabbitmq
+  RP_AMQP_APIPASS: rabbitmq
+  RP_BINARYSTORE_TYPE: minio
+  RP_BINARYSTORE_MINIO_ENDPOINT: http://minio.test.reportportal.local:9000
+  RP_BINARYSTORE_MINIO_ACCESSKEY: miniorootuser
+  RP_BINARYSTORE_MINIO_SECRETKEY: miniorootpass
+  LOGGING_LEVEL_ORG_HIBERNATE_SQL: info
+  JAVA_OPTS: -Xmx1g -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp  -Dcom.sun.management.jmxremote.rmi.port=12349 -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=false  -Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=0.0.0.0
